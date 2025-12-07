@@ -21,7 +21,7 @@ const userSchema = mongoose.Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, "Please enter a valid email"],
     },
-    name: {
+    displayName: {
       type: String,
       required: true,
       trim: true,
@@ -34,7 +34,7 @@ const userSchema = mongoose.Schema(
       trim: true,
       maxlength: 200,
     },
-    image: {
+    photoURL: {
       type: String,
       required: true,
     },
