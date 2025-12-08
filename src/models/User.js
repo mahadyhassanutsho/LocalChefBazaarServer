@@ -13,6 +13,10 @@ export const UserRole = {
 
 const userSchema = mongoose.Schema(
   {
+    uid: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       unique: true,

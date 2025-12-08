@@ -24,6 +24,7 @@ The server follows the **MERN architecture**, serving as the backbone for data m
 
 - **Node.js**
 - **Express.js**
+- **Firebase Admin**
 - **MongoDB + Mongoose**
 - **dotenv** for environment configuration  
 - **cors** for cross-origin access  
