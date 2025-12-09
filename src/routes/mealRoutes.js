@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/", async (req, res, next) => {
   try {
     const query = req.query;
-    const meals = await Meal.find(query);
+    const meals = await Meal.find(query).populate("chef");
     const mealsWithRatings = await Promise.all(
       meals.map(async (meal) => {
         const { avgRating, totalReviews } = await getMealRating(meal._id);
@@ -30,10 +30,10 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const meal = await Meal.findById(req.params.id);
+    const meal = await Meal.findById(req.params.id).populate("chef");
     if (!meal) return next(new AppError("Meal not found", 404));
     const { avgRating, totalReviews } = await getMealRating(meal._id);
-    res.json({ meal: { ...meal, avgRating, totalReviews } });
+    res.json({ meal: { ...meal.toObject(), avgRating, totalReviews } });
   } catch (err) {
     console.error(err);
     next(err);
