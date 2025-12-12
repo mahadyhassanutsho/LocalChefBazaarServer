@@ -8,10 +8,14 @@ const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const { limit, ...filters } = req.query;
+    const { limit, page, sort, order, ...filters } = req.query;
+
     const meals = await Meal.find(filters)
       .limit(Number(limit) || 0)
+      .skip(((Number(page) || 1) - 1) * limit)
+      .sort(sort ? { [sort]: order === "desc" ? -1 : 1 } : {})
       .populate("chef");
+
     const mealsWithRatings = await Promise.all(
       meals.map(async (meal) => {
         const { avgRating, totalReviews } = await getMealRating(meal._id);
