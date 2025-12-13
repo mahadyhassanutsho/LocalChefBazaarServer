@@ -4,6 +4,7 @@ import express from "express";
 import globalErrorHandler from "./middlewares/errors.js";
 import userRoutes from "./routes/userRoutes.js";
 import mealRoutes from "./routes/mealRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 
 const app = express();
@@ -20,6 +21,7 @@ app.get("/", (_req, res) => {
 app.use("/api/users", userRoutes);
 app.use("/api/meals", mealRoutes);
 app.use("/api/requests", requestRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.all(/.*/, (req, res) => {
   return res
