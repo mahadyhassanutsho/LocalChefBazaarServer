@@ -27,8 +27,6 @@ router.get("/", async (req, res, next) => {
       })
     );
 
-    console.log(mealsWithRatings);
-
     res.json(mealsWithRatings);
   } catch (err) {
     console.error(err);
