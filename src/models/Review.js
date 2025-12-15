@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+import Meal from "./Meal.js";
+
 const reviewSchema = mongoose.Schema(
   {
     rating: {
@@ -23,29 +25,34 @@ const reviewSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+reviewSchema.post("save", async function () {
+  await updateMealRating(this.meal);
+});
+
+reviewSchema.post("findOneAndDelete", async function (doc) {
+  if (doc) {
+    await updateMealRating(doc.meal);
+  }
+});
+
 const Review = mongoose.model("Review", reviewSchema);
 
-export async function getMealRating(mealId) {
+const updateMealRating = async (mealId) => {
   const result = await Review.aggregate([
-    {
-      $match: {
-        meal: new mongoose.Types.ObjectId(mealId),
-        rating: { $type: "number" },
-      },
-    },
+    { $match: { meal: new mongoose.Types.ObjectId(mealId) } },
     {
       $group: {
-        _id: null,
+        _id: "$meal",
         avgRating: { $avg: "$rating" },
         totalReviews: { $sum: 1 },
       },
     },
   ]);
 
-  return {
+  await Meal.findByIdAndUpdate(mealId, {
     avgRating: result[0]?.avgRating ?? 0,
     totalReviews: result[0]?.totalReviews ?? 0,
-  };
-}
+  });
+};
 
 export default Review;

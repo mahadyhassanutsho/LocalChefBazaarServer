@@ -2,7 +2,6 @@ import express from "express";
 
 import Meal from "../models/Meal.js";
 import AppError from "../utils/AppError.js";
-import { getMealRating } from "../models/Review.js";
 
 const router = express.Router();
 
@@ -16,18 +15,7 @@ router.get("/", async (req, res, next) => {
       .sort(sort ? { [sort]: order === "desc" ? -1 : 1 } : {})
       .populate("chef");
 
-    const mealsWithRatings = await Promise.all(
-      meals.map(async (meal) => {
-        const { avgRating, totalReviews } = await getMealRating(meal._id);
-        return {
-          ...meal.toObject(),
-          avgRating,
-          totalReviews,
-        };
-      })
-    );
-
-    res.json(mealsWithRatings);
+    res.json(meals);
   } catch (err) {
     console.error(err);
     next(err);
@@ -38,8 +26,7 @@ router.get("/:id", async (req, res, next) => {
   try {
     const meal = await Meal.findById(req.params.id).populate("chef");
     if (!meal) return next(new AppError("Meal not found", 404));
-    const { avgRating, totalReviews } = await getMealRating(meal._id);
-    res.json({ ...meal.toObject(), avgRating, totalReviews });
+    res.json(meal);
   } catch (err) {
     console.error(err);
     next(err);

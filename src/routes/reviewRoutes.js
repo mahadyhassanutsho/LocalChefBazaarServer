@@ -29,7 +29,8 @@ router.get("/:id", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const review = await Review.create(req.body);
+    const review = new Review(req.body);
+    await review.save();
     res.status(201).json(review);
   } catch (err) {
     console.error(err);
