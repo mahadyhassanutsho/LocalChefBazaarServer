@@ -7,10 +7,14 @@ const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const query = req.query;
-    const reviews = await Review.find(query)
+    const { limit, page, sort, order, ...filters } = req.query;
+
+    const reviews = await Review.find(filters)
+      .limit(Number(limit) || 0)
+      .skip(((Number(page) || 1) - 1) * limit)
+      .sort(sort ? { [sort]: order === "desc" ? -1 : 1 } : {})
       .populate("reviewer")
-      .populate("meal");
+      .populate({ path: "meal", populate: { path: "chef" } });
     res.json(reviews);
   } catch (err) {
     console.error(err);
@@ -22,7 +26,7 @@ router.get("/:id", async (req, res, next) => {
   try {
     const review = await Review.findById(req.params.id)
       .populate("reviewer")
-      .populate("meal");
+      .populate({ path: "meal", populate: { path: "chef" } });
     if (!review) return next(new AppError("Review not found", 404));
     res.json(review);
   } catch (err) {
