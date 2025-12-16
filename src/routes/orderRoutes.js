@@ -13,15 +13,20 @@ const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const query = req.query;
-    const orders = await Order.find(query)
+    const query = { ...req.query };
+    const chefId = query.chef;
+    delete query.chef;
+
+    let orders = await Order.find(query)
       .populate("user")
       .populate({
         path: "meal",
-        populate: {
-          path: "chef",
-        },
+        match: chefId ? { chef: chefId } : {},
+        populate: { path: "chef" },
       });
+
+    orders = orders.filter((o) => o.meal !== null);
+
     res.json(orders);
   } catch (err) {
     console.error(err);
@@ -142,6 +147,20 @@ router.patch("/", async (req, res, next) => {
     }
 
     res.json({ success: false, existingOrder });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+});
+
+router.patch("/:id", async (req, res, next) => {
+  try {
+    const review = await Order.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!review) return next(new AppError("Order not found", 404));
+    res.json(review);
   } catch (err) {
     console.error(err);
     next(err);

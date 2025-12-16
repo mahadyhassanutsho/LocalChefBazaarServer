@@ -22,7 +22,7 @@ router.get("/stats", async (_req, res, next) => {
     const cancelledOrders = await Order.countDocuments({ status: "cancelled" });
 
     const revenueAgg = await Order.aggregate([
-      { $match: { status: "paid" } },
+      { $match: { status: "delivered" } },
       {
         $group: {
           _id: null,

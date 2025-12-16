@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const OrderStatus = {
   PENDING: "pending",
   PAID: "paid",
+  ACCEPTED: "accepted",
   CANCELLED: "cancelled",
   ON_DELIVERY: "on-delivery",
   DELIVERED: "delivered",
