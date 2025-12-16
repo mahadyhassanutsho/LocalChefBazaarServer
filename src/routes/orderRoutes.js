@@ -57,9 +57,11 @@ router.post("/", async (req, res, next) => {
     const existingUser = await User.findById(user);
     if (!existingUser) return next(new AppError("User not found", 404));
 
-    const order = await Order.create(req.body);
-
-    const amount = existingMeal.price;
+    const order = await Order.create({
+      ...req.body,
+      paymentAmount: existingMeal.price * quantity,
+      unitPrice: existingMeal.price,
+    });
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -67,7 +69,7 @@ router.post("/", async (req, res, next) => {
         {
           price_data: {
             currency: "BDT",
-            unit_amount: amount * 100,
+            unit_amount: order.unitPrice * 100,
             product_data: {
               name: existingMeal.name,
               images: [existingMeal.image],
@@ -89,7 +91,25 @@ router.post("/", async (req, res, next) => {
       },
     });
 
-    res.status(201).json({ order, payment: session });
+    const updatedOrder = await Order.findByIdAndUpdate(
+      order._id,
+      {
+        paymentUrl: session.url,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .populate("user")
+      .populate({
+        path: "meal",
+        populate: {
+          path: "chef",
+        },
+      });
+
+    res.status(201).json(updatedOrder);
   } catch (err) {
     console.error(err);
     next(err);
@@ -121,7 +141,7 @@ router.patch("/", async (req, res, next) => {
       return res.json({ success: true, order });
     }
 
-    res.json({ success: false, order });
+    res.json({ success: false, existingOrder });
   } catch (err) {
     console.error(err);
     next(err);

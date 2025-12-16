@@ -8,7 +8,9 @@ const router = express.Router();
 router.get("/", async (req, res, next) => {
   try {
     const query = req.query;
-    const reviews = await Review.find(query).populate("reviewer");
+    const reviews = await Review.find(query)
+      .populate("reviewer")
+      .populate("meal");
     res.json(reviews);
   } catch (err) {
     console.error(err);
@@ -18,7 +20,9 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const review = await Review.findById(req.params.id).populate("reviewer");
+    const review = await Review.findById(req.params.id)
+      .populate("reviewer")
+      .populate("meal");
     if (!review) return next(new AppError("Review not found", 404));
     res.json(review);
   } catch (err) {

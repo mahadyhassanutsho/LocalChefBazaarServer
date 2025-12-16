@@ -20,6 +20,18 @@ const orderSchema = mongoose.Schema(
     trackingId: {
       type: String,
     },
+    paymentUrl: {
+      type: String,
+    },
+    paymentAmount: {
+      type: Number,
+      required: true,
+    },
+    unitPrice: {
+      type: Number,
+      required: true,
+    },
+
     status: {
       type: String,
       enum: Object.values(OrderStatus),

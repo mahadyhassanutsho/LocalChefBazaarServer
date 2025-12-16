@@ -16,17 +16,17 @@ router.get("/stats", async (_req, res, next) => {
     const totalUsers = await User.countDocuments({ role: "user" });
     const totalChefs = await User.countDocuments({ role: "chef" });
 
+    const paidOrders = await Order.countDocuments({ status: "paid" });
     const pendingOrders = await Order.countDocuments({ status: "pending" });
     const deliveredOrders = await Order.countDocuments({ status: "delivered" });
     const cancelledOrders = await Order.countDocuments({ status: "cancelled" });
 
     const revenueAgg = await Order.aggregate([
-      { $match: { status: "delivered" } },
+      { $match: { status: "paid" } },
       {
         $group: {
           _id: null,
           totalRevenue: { $sum: "$paymentAmount" },
-          avgOrderValue: { $avg: "$paymentAmount" },
         },
       },
     ]);
@@ -54,6 +54,7 @@ router.get("/stats", async (_req, res, next) => {
       totalMeals,
       totalOrders,
       totalReviews,
+      paidOrders,
       pendingOrders,
       deliveredOrders,
       cancelledOrders,
