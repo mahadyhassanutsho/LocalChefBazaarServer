@@ -2,10 +2,13 @@ import cors from "cors";
 import express from "express";
 
 import globalErrorHandler from "./middlewares/errors.js";
+import { logRequest } from "./middlewares/logger.js";
+
 import userRoutes from "./routes/userRoutes.js";
 import mealRoutes from "./routes/mealRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import favoriteRoutes from "./routes/favoriteRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 
 const app = express();
@@ -13,6 +16,7 @@ const app = express();
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(logRequest);
 
 // Routes
 app.get("/", (_req, res) => {
@@ -23,6 +27,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/meals", mealRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/favorites", favoriteRoutes);
+app.use("/api/orders", orderRoutes);
 app.use("/api/requests", requestRoutes);
 
 app.all(/.*/, (req, res) => {

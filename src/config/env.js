@@ -18,4 +18,8 @@ export const clientCertUrl = process.env.FIREBASE_CLIENT_CERT_URL;
 
 export const mongoURI = process.env.MONGO_URI;
 
+export const stripeSecret = process.env.STRIPE_SECRET;
+
+export const siteDomain = process.env.SITE_DOMAIN;
+
 export const port = process.env.PORT;
