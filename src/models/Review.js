@@ -47,6 +47,12 @@ const updateMealRating = async (mealId) => {
         totalReviews: { $sum: 1 },
       },
     },
+    {
+      $project: {
+        avgRating: { $round: ["$avgRating", 1] },
+        totalReviews: 1,
+      },
+    },
   ]);
 
   await Meal.findByIdAndUpdate(mealId, {

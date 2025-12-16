@@ -4,6 +4,7 @@ import express from "express";
 import globalErrorHandler from "./middlewares/errors.js";
 import { logRequest } from "./middlewares/logger.js";
 
+import generalRoutes from "./routes/generalRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import mealRoutes from "./routes/mealRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
@@ -22,6 +23,8 @@ app.use(logRequest);
 app.get("/", (_req, res) => {
   res.json({ message: "Welcome to LocalChefBazaar Server." });
 });
+
+app.use("/api", generalRoutes);
 
 app.use("/api/users", userRoutes);
 app.use("/api/meals", mealRoutes);
