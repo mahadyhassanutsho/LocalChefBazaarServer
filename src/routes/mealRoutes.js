@@ -7,11 +7,40 @@ const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const { limit, page, sort, order, ...filters } = req.query;
+    const {
+      limit,
+      page,
+      sort,
+      order,
+      search,
+      minPrice,
+      maxPrice,
+      maxDeliveryTime,
+      ...filters
+    } = req.query;
 
-    const meals = await Meal.find(filters)
+    const query = { ...filters };
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { ingredients: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    if (maxDeliveryTime) {
+      query.estimatedDeliveryTime = { $lte: Number(maxDeliveryTime) };
+    }
+
+    const meals = await Meal.find(query)
       .limit(Number(limit) || 0)
-      .skip(((Number(page) || 1) - 1) * limit)
+      .skip(((Number(page) || 1) - 1) * (Number(limit) || 0))
       .sort(sort ? { [sort]: order === "desc" ? -1 : 1 } : {})
       .populate("chef");
 
